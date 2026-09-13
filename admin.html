@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BISON Admin Panel</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #111;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header img {
+            height: 50px;
+            width: auto;
+        }
+
+        .admin-title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .login-box,
+        .admin-panel {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .login-box {
+            max-width: 420px;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px;
+            margin: 8px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: #111;
+            color: white;
+        }
+
+        .login-btn:hover {
+            background: #333;
+        }
+
+        .logout-btn {
+            background: #e53935;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background: #c62828;
+        }
+
+        .save-btn {
+            background: #111;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #ddd;
+            margin-left: 8px;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #b00000;
+        }
+
+        .success {
+            background: #dff5df;
+            color: #176b17;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-section {
+            border-top: 1px solid #ddd;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+
+        .products {
+            margin-top: 30px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .product-info h3 {
+            margin-bottom: 7px;
+        }
+
+        .product-info p {
+            color: #666;
+            margin: 4px 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn {
+            background: #1976d2;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e53935;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .note {
+            background: #fff8dc;
+            border-left: 4px solid #e0b000;
+            padding: 12px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 15px;
+            }
+
+            .login-box,
+            .admin-panel {
+                margin: 20px 12px;
+                padding: 20px;
+            }
+
+            .product-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <img src="images/bison-logo.jpg" alt="BISON Logo">
+    </div>
+
+    <div class="admin-title">
+        BISON Admin
+    </div>
+
+    <button
+        id="logoutButton"
+        class="logout-btn hidden"
+        onclick="logout()">
+        Logout
+    </button>
+</header>
+
+
+<!-- LOGIN -->
+<section id="loginSection" class="login-box">
+
+    <h1>Admin Login</h1>
+
+    <p style="margin-bottom:20px;color:#666;">
+        Login to manage BISON products.
+    </p>
+
+    <label>Username</label>
+    <input
+        type="text"
+        id="username"
+        placeholder="Enter username">
+
+    <label>Password</label>
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter password">
+
+    <button
+        class="login-btn"
+        onclick="login()">
+        Login
+    </button>
+
+    <div id="loginMessage" class="message error"></div>
+
+</section>
+
+
+<!-- ADMIN PANEL -->
+<section id="adminSection" class="admin-panel hidden">
+
+    <div class="top-bar">
+        <div>
+            <h1>BISON Admin Panel</h1>
+            <p style="color:#666;">
+                Add, edit and delete products.
+            </p>
+        </div>
+    </div>
+
+    <div class="note">
+        ⚠️ This is a browser-based admin system. It is suitable for
+        your current development/testing stage, but it is not
+        server-level security.
+    </div>
+
+
+    <!-- PRODUCT FORM -->
+
+    <div class="form-section">
+
+        <h2 id="formTitle">Add New Product</h2>
+
+        <input type="hidden" id="editId">
+
+        <label>Product Name</label>
+        <input
+            type="text"
+            id="productName"
+            placeholder="Example: Premium Black T-Shirt">
+
+        <label>Category</label>
+        <select id="productCategory">
+            <option value="Men T-Shirts">Men T-Shirts</option>
+            <option value="Men Shirts">Men Shirts</option>
+            <option value="Men Jeans">Men Jeans</option>
+            <option value="Men Trousers">Men Trousers</option>
+            <option value="Men Jackets">Men Jackets</option>
+
+            <option value="Boys T-Shirts">Boys T-Shirts</option>
+            <option value="Boys Shirts">Boys Shirts</option>
+            <option value="Boys Jeans">Boys Jeans</option>
+            <option value="Boys Trousers">Boys Trousers</option>
+            <option value="Boys Jackets">Boys Jackets</option>
+        </select>
+
+        <label>Price (PKR)</label>
+        <input
+            type="number"
+            id="productPrice"
+            placeholder="1499">
+
+        <label>Quantity / Stock</label>
+        <input
+            type="number"
+            id="productQuantity"
+            placeholder="20">
+
+        <label>Quality</label>
+        <input
+            type="text"
+            id="productQuality"
+            placeholder="Premium Quality">
+
+        <label>Rating</label>
+        <input
+            type="number"
+            id="productRating"
+            min="1"
+            max="5"
+            step="0.1"
+            value="5">
+
+        <label>Description</label>
+        <textarea
+            id="productDescription"
+            placeholder="Write product description..."></textarea>
+
+        <label>Sizes</label>
+        <input
+            type="text"
+            id="productSizes"
+            placeholder="S, M, L, XL">
+
+        <label>Colors</label>
+        <input
+            type="text"
+            id="productColors"
+            placeholder="Black, White, Blue">
+
+        <label>Product Icon</label>
+        <input
+            type="text"
+            id="productIcon"
+            placeholder="👕">
+
+        <label>Stock Status</label>
+        <select id="productStock">
+            <option value="In Stock">In Stock</option>
+            <option value="Limited Stock">Limited Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+        </select>
+
+        <button
+            class="save-btn"
+            onclick="saveProduct()">
+            Save Product
+        </button>
+
+        <button
+            id="cancelEditButton"
+            class="cancel-btn hidden"
+            onclick="cancelEdit()">
+            Cancel Edit
+        </button>
+
+        <div id="formMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- PRODUCTS -->
+
+    <div class="products">
+
+        <h2>Products</h2>
+
+        <div id="productsList"></div>
+
+    </div>
+
+</section>
+
+
+<script>
+
+    /*
+    ==========================================
+    ADMIN LOGIN
+    ==========================================
+    */
+
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "BISON123";
+
+
+    /*
+    ==========================================
+    LOGIN
+    ==========================================
+    */
+
+    function login() {
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const message =
+            document.getElementById("loginMessage");
+
+
+        if (
+            username === ADMIN_USERNAME &&
+            password === ADMIN_PASSWORD
+        ) {
+
+            sessionStorage.setItem(
+                "bisonAdminLoggedIn",
+                "true"
+            );
+
+            showAdminPanel();
+
+        } else {
+
+            message.textContent =
+                "Incorrect username or password.";
+
+            message.style.display = "block";
+        }
+    }
+
+
+    /*
+    ==========================================
+    SHOW ADMIN
+    ==========================================
+    */
+
+    function showAdminPanel() {
+
+        document
+            .getElementById("loginSection")
+            .classList.add("hidden");
+
+        document
+            .getElementById("adminSection")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("logoutButton")
+            .classList.remove("hidden");
+
+        loadProducts();
+    }
+
+
+    /*
+    ==========================================
+    LOGOUT
+    ==========================================
+    */
+
+    function logout() {
+
+        sessionStorage.removeItem(
+            "bisonAdminLoggedIn"
+        );
+
+        location.reload();
+    }
+
+
+    /*
+    ==========================================
+    DEFAULT PRODUCTS
+    ==========================================
+    */
+
+    const defaultProducts = [
+
+        {
+            id: 1,
+            name: "Classic Black T-Shirt",
+            category: "Men T-Shirts",
+            price: 1499,
+            quantity: 20,
+            quality: "Premium Quality",
+            rating: 4.8,
+            description: "Classic comfortable black T-shirt.",
+            sizes: ["S", "M", "L", "XL"],
+            colors: ["Black"],
+            icon: "👕",
+            stock: "In Stock"
+        },
+
+        {
+            id: 2,
+            name: "Premium Casual Shirt",
+            category: "Men Shirts",
+            price: 2499,
+            quantity: 15,
+            quality: "Premium Quality",
+            rating: 4.7,
+            description: "Smart casual shirt for men.",
+            sizes: ["M", "L", "XL"],
+            colors: ["White", "Blue"],
+            icon: "👔",
+            stock: "In Stock"
+        },
+
+        {
+            id: 3,
+            name: "Classic Blue Jeans",
+            category: "Men Jeans",
+            price: 3299,
+            quantity: 12,
+            quality: "Premium Denim",
+            rating: 4.9,
+            description: "Comfortable classic blue jeans.",
+            sizes: ["30", "32", "34", "36"],
+            colors: ["Blue"],
+            icon: "👖",
+            stock: "In Stock"
+        },
+
+        {
+            id: 4,
+            name: "Smart Fit Trousers",
+            category: "Men Trousers",
+            price: 2799,
+            quantity: 10,
+            quality: "High Quality",
+            rating: 4.6,
+            description: "Smart fit trousers for everyday wear.",
+            sizes: ["30", "32", "34", "36"],
+            colors: ["Black", "Grey"],
+            icon: "👖",
+            stock: "In Stock"
+        },
+
+        {
+            id: 5,
+            name: "Kids Casual T-Shirt",
+            category: "Boys T-Shirts",
+            price: 999,
+            quantity: 25,
+            quality: "Soft Cotton",
+            rating: 4.8,
+            description: "Comfortable T-shirt for boys.",
+            sizes: ["4Y", "6Y", "8Y", "10Y"],
+            colors: ["Blue", "Red"],
+            icon: "👕",
+            stock: "In Stock"
+        },
+
+        {
+            id: 6,
+            name: "Boys Casual Shirt",
+            category: "Boys Shirts",
+            price: 1499,
+            quantity: 18,
+            quality: "Premium Cotton",
+            rating: 4.7,
+            description: "Stylish casual shirt for boys.",
+            sizes: ["6Y", "8Y", "10Y", "12Y"],
+            colors: ["White", "Blue"],
+            icon: "👔",
+            stock: "In Stock"
+        },
+
+        {
+            id: 7,
+            name: "Boys Denim Jeans",
+            category: "Boys Jeans",
+            price: 1999,
+            quantity: 14,
+            quality: "Durable Denim",
+            rating: 4.8,
+            description: "Comfortable denim jeans for boys.",
+            sizes: ["6Y", "8Y", "10Y", "12Y"],
+            colors: ["Blue"],
+            icon: "👖",
+            stock: "In Stock"
+        },
+
+        {
+            id: 8,
+            name: "Classic Casual Jacket",
+            category: "Men Jackets",
+            price: 4499,
+            quantity: 8,
+            quality: "Premium Quality",
+            rating: 4.9,
+            description: "Classic jacket for a stylish look.",
+            sizes: ["M", "L", "XL"],
+            colors: ["Black", "Brown"],
+            icon: "🧥",
+            stock: "Limited Stock"
+        }
+
+    ];
+
+
+    /*
+    ==========================================
+    LOAD PRODUCTS
+    ==========================================
+    */
+
+    function getProducts() {
+
+        const saved =
+            localStorage.getItem("bisonProducts");
+
+        if (saved) {
+
+            return JSON.parse(saved);
+
+        }
+
+        localStorage.setItem(
+            "bisonProducts",
+            JSON.stringify(defaultProducts)
+        );
+
+        return defaultProducts;
+    }
+
+
+    /*
+    ==========================================
+    SAVE PRODUCTS
+    ==========================================
+    */
+
+    function saveProducts(products) {
+
+        localStorage.setItem(
+            "bisonProducts",
+            JSON.stringify(products)
+        );
+    }
+
+
+    /*
+    ==========================================
+    DISPLAY PRODUCTS
+    ==========================================
+    */
+
+    function loadProducts() {
+
+        const products = getProducts();
+
+        const list =
+            document.getElementById("productsList");
+
+        list.innerHTML = "";
+
+
+        if (products.length === 0) {
+
+            list.innerHTML =
+                '<div class="empty">No products found.</div>';
+
+            return;
+        }
+
+
+        products.forEach(product => {
+
+            const card =
+                document.createElement("div");
+
+            card.className = "product-card";
+
+
+            card.innerHTML = `
+
+                <div class="product-info">
+
+                    <h3>
+                        ${escapeHTML(product.icon || "👕")}
+                        ${escapeHTML(product.name)}
+                    </h3>
+
+                    <p>
+                        Category:
+                        ${escapeHTML(product.category)}
+                    </p>
+
+                    <p>
+                        Price:
+                        PKR ${Number(product.price).toLocaleString()}
+                    </p>
+
+                    <p>
+                        Quantity:
+                        ${Number(product.quantity || 0)}
+                    </p>
+
+                    <p>
+                        Stock:
+                        ${escapeHTML(product.stock || "In Stock")}
+                    </p>
+
+                </div>
+
+                <div class="actions">
+
+                    <button
+                        class="edit-btn"
+                        onclick="editProduct(${product.id})">
+                        Edit
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteProduct(${product.id})">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+
+
+            list.appendChild(card);
+
+        });
+    }
+
+
+    /*
+    ==========================================
+    SAVE / UPDATE PRODUCT
+    ==========================================
+    */
+
+    function saveProduct() {
+
+        let products = getProducts();
+
+        const editId =
+            document.getElementById("editId").value;
+
+
+        const name =
+            document.getElementById("productName").value.trim();
+
+        const category =
+            document.getElementById("productCategory").value;
+
+        const price =
+            Number(document.getElementById("productPrice").value);
+
+        const quantity =
+            Number(document.getElementById("productQuantity").value);
+
+        const quality =
+            document.getElementById("productQuality").value.trim();
+
+        const rating =
+            Number(document.getElementById("productRating").value);
+
+        const description =
+            document.getElementById("productDescription").value.trim();
+
+        const sizes =
+            document
+                .getElementById("productSizes")
+                .value
+                .split(",")
+                .map(x => x.trim())
+                .filter(Boolean);
+
+        const colors =
+            document
+                .getElementById("productColors")
+                .value
+                .split(",")
+                .map(x => x.trim())
+                .filter(Boolean);
+
+        const icon =
+            document.getElementById("productIcon").value.trim();
+
+        const stock =
+            document.getElementById("productStock").value;
+
+
+        if (!name || !price) {
+
+            showFormMessage(
+                "Please enter product name and price.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const product = {
+
+            id: editId
+                ? Number(editId)
+                : Date.now(),
+
+            name,
+            category,
+            price,
+            quantity,
+            quality,
+            rating,
+            description,
+            sizes,
+            colors,
+            icon,
+            stock
+        };
+
+
+        if (editId) {
+
+            const index =
+                products.findIndex(
+                    p => p.id === Number(editId)
+                );
+
+            if (index !== -1) {
+
+                products[index] = product;
+            }
+
+        } else {
+
+            products.push(product);
+        }
+
+
+        saveProducts(products);
+
+        loadProducts();
+
+        resetForm();
+
+
+        showFormMessage(
+            editId
+                ? "Product updated successfully!"
+                : "Product added successfully!",
+            "success"
+        );
+    }
+
+
+    /*
+    ==========================================
+    EDIT PRODUCT
+    ==========================================
+    */
+
+    function editProduct(id) {
+
+        const products = getProducts();
+
+        const product =
+            products.find(p => p.id === id);
+
+        if (!product) return;
+
+
+        document.getElementById("editId").value =
+            product.id;
+
+        document.getElementById("productName").value =
+            product.name;
+
+        document.getElementById("productCategory").value =
+            product.category;
+
+        document.getElementById("productPrice").value =
+            product.price;
+
+        document.getElementById("productQuantity").value =
+            product.quantity;
+
+        document.getElementById("productQuality").value =
+            product.quality;
+
+        document.getElementById("productRating").value =
+            product.rating;
+
+        document.getElementById("productDescription").value =
+            product.description;
+
+        document.getElementById("productSizes").value =
+            (product.sizes || []).join(", ");
+
+        document.getElementById("productColors").value =
+            (product.colors || []).join(", ");
+
+        document.getElementById("productIcon").value =
+            product.icon;
+
+        document.getElementById("productStock").value =
+            product.stock;
+
+
+        document.getElementById("formTitle").textContent =
+            "Edit Product";
+
+        document
+            .getElementById("cancelEditButton")
+            .classList.remove("hidden");
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+
+    /*
+    ==========================================
+    DELETE PRODUCT
+    ==========================================
+    */
+
+    function deleteProduct(id) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this product?"
+            );
+
+        if (!confirmed) return;
+
+
+        let products = getProducts();
+
+        products =
+            products.filter(
+                product => product.id !== id
+            );
+
+        saveProducts(products);
+
+        loadProducts();
+    }
+
+
+    /*
+    ==========================================
+    CANCEL EDIT
+    ==========================================
+    */
+
+    function cancelEdit() {
+
+        resetForm();
+    }
+
+
+    /*
+    ==========================================
+    RESET FORM
+    ==========================================
+    */
+
+    function resetForm() {
+
+        document.getElementById("editId").value = "";
+
+        document.getElementById("productName").value = "";
+
+        document.getElementById("productPrice").value = "";
+
+        document.getElementById("productQuantity").value = "";
+
+        document.getElementById("productQuality").value = "";
+
+        document.getElementById("productRating").value = "5";
+
+        document.getElementById("productDescription").value = "";
+
+        document.getElementById("productSizes").value = "";
+
+        document.getElementById("productColors").value = "";
+
+        document.getElementById("productIcon").value = "";
+
+        document.getElementById("productStock").value =
+            "In Stock";
+
+        document.getElementById("formTitle").textContent =
+            "Add New Product";
+
+        document
+            .getElementById("cancelEditButton")
+            .classList.add("hidden");
+    }
+
+
+    /*
+    ==========================================
+    MESSAGE
+    ==========================================
+    */
+
+    function showFormMessage(text, type) {
+
+        const message =
+            document.getElementById("formMessage");
+
+        message.textContent = text;
+
+        message.className =
+            "message " + type;
+
+        message.style.display = "block";
+
+
+        setTimeout(() => {
+
+            message.style.display = "none";
+
+        }, 3000);
+    }
+
+
+    /*
+    ==========================================
+    HTML SECURITY
+    ==========================================
+    */
+
+    function escapeHTML(value) {
+
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /*
+    ==========================================
+    CHECK LOGIN ON PAGE LOAD
+    ==========================================
+    */
+
+    window.addEventListener("DOMContentLoaded", () => {
+
+        const loggedIn =
+            sessionStorage.getItem(
+                "bisonAdminLoggedIn"
+            );
+
+        if (loggedIn === "true") {
+
+            showAdminPanel();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
